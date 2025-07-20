@@ -1,0 +1,11 @@
+# Fichiers sensibles avec credentials
+mlflow-secrets.yaml
+
+# Fichiers système Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Fichiers temporaires
+*.tmp

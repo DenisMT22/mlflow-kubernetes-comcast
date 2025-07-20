@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow-server
+  labels:
+    app: mlflow-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow-server
+  template:
+    metadata:
+      labels:
+        app: mlflow-server
+    spec:
+      containers:
+      - name: mlflow-server
+        image: jedha/sample-mlflow-server
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: BACKEND_STORE_URI
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-secrets
+              key: backend-store-uri
+        - name: ARTIFACT_ROOT
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-secrets
+              key: artifact-root
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-secrets
+              key: aws-secret-access-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow-service
+spec:
+  selector:
+    app: mlflow-server
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
